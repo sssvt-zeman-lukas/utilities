@@ -43,6 +43,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="HouseBuilder\HouseBuilder_Adress.cs" />
+    <Compile Include="HouseBuilder\HouseBuilder_Door.cs" />
+    <Compile Include="HouseBuilder\HouseBuilder_Flat.cs" />
+    <Compile Include="HouseBuilder\HouseBuilder_Floor.cs" />
+    <Compile Include="HouseBuilder\HouseBuilder_House.cs" />
+    <Compile Include="HouseBuilder\HouseBuilder_TowerBlock.cs" />
+    <Compile Include="HouseBuilder\HouseBuilder_Window.cs" />
     <Compile Include="MyStreamReader.cs" />
     <Compile Include="DocumentAnalyzer.cs" />
     <Compile Include="Program.cs" />
