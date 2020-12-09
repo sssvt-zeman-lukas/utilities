@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="HouseBuilder.cs" />
     <Compile Include="HouseBuilder\HouseBuilder_Adress.cs" />
     <Compile Include="HouseBuilder\HouseBuilder_Door.cs" />
     <Compile Include="HouseBuilder\HouseBuilder_Flat.cs" />

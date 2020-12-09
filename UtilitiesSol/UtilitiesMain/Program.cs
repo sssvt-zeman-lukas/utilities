@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 
+
 namespace UtilitiesMain
 {
     class Program
@@ -58,8 +59,7 @@ namespace UtilitiesMain
             switch (optionNumber)
             {
                 case 0:
-                    HouseBuilder();
-                    break;
+                    goto New;
 
                 case 1:
                     ProcessArray();
@@ -91,7 +91,9 @@ namespace UtilitiesMain
                     break;
 
                 case 8:
-                    HouseBuilder();
+                    New:
+                    HouseBuilder_program HouseBuilderInstance = new HouseBuilder_program();
+                    HouseBuilderInstance.HouseBuilder();
                     break;
             }
         }
@@ -1181,305 +1183,7 @@ namespace UtilitiesMain
             {
                 goto input;
             }
-        }
+        }        
 
-        static void HouseBuilder()
-        {
-            //vytvoření dveří
-            HouseBuilder.HouseBuilder_Door door1 = new HouseBuilder.HouseBuilder_Door(0.9, 2.2, false);
-            HouseBuilder.HouseBuilder_Door door2 = new HouseBuilder.HouseBuilder_Door(1.8, 2.1, true);
-
-            //vytvoření oken
-            HouseBuilder.HouseBuilder_Window window1 = new HouseBuilder.HouseBuilder_Window("Standard", 0.8, 1.5);
-            HouseBuilder.HouseBuilder_Window window2 = new HouseBuilder.HouseBuilder_Window("Standard", 0.8, 1.5);
-            HouseBuilder.HouseBuilder_Window window3 = new HouseBuilder.HouseBuilder_Window("Francouz", 1.0, 2.2);
-
-            //vytvoření domů
-            HouseBuilder.HouseBuilder_House house1 = new HouseBuilder.HouseBuilder_House(8.5, 3.2, door1, window1, window2);
-            HouseBuilder.HouseBuilder_House house2 = new HouseBuilder.HouseBuilder_House(12.1, 4.5, door2, window1, window3);
-
-            //vytvoření bytů
-            HouseBuilder.HouseBuilder_Flat flat1 = new HouseBuilder.HouseBuilder_Flat(8.5, 3.2, door1, window1, window2);
-            HouseBuilder.HouseBuilder_Flat flat2 = new HouseBuilder.HouseBuilder_Flat(12.1, 4.5, door2, window1, window3);
-            HouseBuilder.HouseBuilder_Flat flat3 = new HouseBuilder.HouseBuilder_Flat(10.2, 3.2, door2, window1, window2);
-            HouseBuilder.HouseBuilder_Flat flat4 = new HouseBuilder.HouseBuilder_Flat(5.5, 3.2, door1, window1, null);
-            HouseBuilder.HouseBuilder_Flat flat5 = new HouseBuilder.HouseBuilder_Flat(8.2, 3.2, door1, window3, window3);
-
-            //vytvoření pater - nejdříve vytvoříme listy pro jednotlivá patra, které budou obsahovat byty na každém patře
-            List<HouseBuilder.HouseBuilder_Flat> floor0_Flats = new List<HouseBuilder.HouseBuilder_Flat>();
-            List<HouseBuilder.HouseBuilder_Flat> floor1_Flats = new List<HouseBuilder.HouseBuilder_Flat>();
-            List<HouseBuilder.HouseBuilder_Flat> floor2_Flats = new List<HouseBuilder.HouseBuilder_Flat>();
-            
-            //vytvoření pater - zapíšeme jednotlivé byty do listů pater
-            floor0_Flats.Add(flat3);
-            floor0_Flats.Add(flat4);           
-            floor1_Flats.Add(flat5);
-            floor1_Flats.Add(flat1);
-            floor2_Flats.Add(flat2);
-
-            //vytvoření pater - vytvoříme instance tří pater
-            HouseBuilder.HouseBuilder_Floor floor0 = new HouseBuilder.HouseBuilder_Floor(0, "přízemí", floor0_Flats);            
-            HouseBuilder.HouseBuilder_Floor floor1 = new HouseBuilder.HouseBuilder_Floor(1, "byt s francouzskými okny má balkon", floor1_Flats);            
-            HouseBuilder.HouseBuilder_Floor floor2 = new HouseBuilder.HouseBuilder_Floor(2, "s luxusním bytem a verandou", floor2_Flats);
-
-            //vytvoření adres
-            HouseBuilder.HouseBuilder_Adress adress1 = new HouseBuilder.HouseBuilder_Adress("K Ládví", 344, "Praha 8", 18100);
-            HouseBuilder.HouseBuilder_Adress adress2 = new HouseBuilder.HouseBuilder_Adress("Vodičkova", 699, "Praha 1", 11000);
-            HouseBuilder.HouseBuilder_Adress adress3 = new HouseBuilder.HouseBuilder_Adress("Sněmovní", 176, "Praha 1", 11826);
-
-            //vytvoření paneláku - vytvoříme list obsahující jednotlivá patra paneláku
-            List<HouseBuilder.HouseBuilder_Floor> towerBlock1_Floors = new List<HouseBuilder.HouseBuilder_Floor>();
-            towerBlock1_Floors.Add(floor0);
-            towerBlock1_Floors.Add(floor1);
-            towerBlock1_Floors.Add(floor2);
-            
-            //vytvoření paneláku - vytvoříme instanci paneláku
-            HouseBuilder.HouseBuilder_TowerBlock towerBlock1 = new HouseBuilder.HouseBuilder_TowerBlock(adress1, towerBlock1_Floors);
-
-            //vypsání dveří
-            Console.WriteLine("Dveře číslo 1 mají {0} metru na šířku, {1} metru na výšku a jsou " + ((door1.TwoSided == false) ? "jednokřídlé." : "dvoukřídlé."), door1.Width, door1.Width);
-            Console.WriteLine("Dveře číslo 2 mají {0} metru na šířku, {1} metru na výšku a jsou " + ((door2.TwoSided == false) ? "jednokřídlé." : "dvoukřídlé."), door2.Width, door2.Width);
-
-            //vypsání oken
-            Console.WriteLine();
-            Console.WriteLine("Okno typu {0} má šířku {1} metru a výšku {2} metru.", window1.Name, window1.Width, window1.Height);
-            Console.WriteLine("Okno typu {0} má šířku {1} metru a výšku {2} metru.", window2.Name, window2.Width, window2.Height);
-            Console.WriteLine("Okno typu {0} má šířku {1} metru a výšku {2} metru.", window3.Name, window3.Width, window3.Height);
-
-            //vypsání domů
-            Console.WriteLine();
-            string windowsHouse1; string windowsHouse2;
-            
-            if (house1.Window2 == null)
-            {
-                windowsHouse1 = "jedno okno typu " + house1.Window1.Name;
-            }
-            else if (house1.Window1.Name == house1.Window2.Name)
-            {
-                windowsHouse1 = "dvě okna typu " + house1.Window1.Name;
-            }
-            else
-            {
-                windowsHouse1 = "jedno okno typu " + house1.Window1.Name + " a jedno typu " + house1.Window2.Name;
-            }
-
-            if (house2.Window2 == null)
-            {
-                windowsHouse2 = "jedno okno typu " + house2.Window1.Name;
-            }
-            else if (house2.Window1.Name == house2.Window2.Name)
-            {
-                windowsHouse2 = "dvě okna typu " + house2.Window1.Name;
-            }
-            else
-            {
-                windowsHouse2 = "jedno okno typu " + house2.Window1.Name + " a jedno typu " + house2.Window2.Name;
-            }
-
-            Console.WriteLine("Dům číslo 1 má šířku {0} metru a výšku {1} metru. Je tvořen " + ((house1.Door.TwoSided == true) ? "dvoukřídlými" : "jednokřídlymi") + " dveřmi a má {2}.", house1.Width, house1.Height, windowsHouse1);
-            Console.WriteLine("Dům číslo 2 má šířku {0} metru a výšku {1} metru. Je tvořen " + ((house2.Door.TwoSided == true) ? "dvoukřídlými" : "jednokřídlymi") + " dveřmi a má {2}.", house2.Width, house2.Height, windowsHouse2);
-
-            //vypsání bytů 
-            Console.WriteLine();
-            string windowsFlat1; string windowsFlat2; string windowsFlat3; string windowsFlat4; string windowsFlat5;
-
-            if (flat1.Window2 == null)
-            {
-                windowsFlat1 = "jedno okno typu " + flat1.Window1.Name;
-            }            
-            else if (flat1.Window1.Name == flat1.Window2.Name)
-            {
-                windowsFlat1 = "dvě okna typu " + flat1.Window1.Name;
-            }
-            else
-            {
-                windowsFlat1 = "jedno okno typu " + flat1.Window1.Name + " a jedno typu " + flat1.Window2.Name;
-            }
-
-            if (flat2.Window2 == null)
-            {
-                windowsFlat2 = "jedno okno typu " + flat2.Window1.Name;
-            }
-            else if (flat2.Window1.Name == flat2.Window2.Name)
-            {
-                windowsFlat2 = "dvě okna typu " + flat2.Window1.Name;
-            }
-            else
-            {
-                windowsFlat2 = "jedno okno typu " + flat2.Window1.Name + " a jedno typu " + flat2.Window2.Name;
-            }
-
-            if (flat3.Window2 == null)
-            {
-                windowsFlat3 = "jedno okno typu " + flat3.Window1.Name;
-            }
-            else if (flat3.Window1.Name == flat3.Window2.Name)
-            {
-                windowsFlat3 = "dvě okna typu " + flat3.Window1.Name;
-            }
-            else
-            {
-                windowsFlat3 = "jedno okno typu " + flat3.Window1.Name + " a jedno typu " + flat3.Window2.Name;
-            }
-
-            if (flat4.Window2 == null)
-            {
-                windowsFlat4 = "jedno okno typu " + flat4.Window1.Name;
-            }
-            else if (flat4.Window1.Name == flat4.Window2.Name)
-            {
-                windowsFlat4 = "dvě okna typu " + flat4.Window1.Name;
-            }
-            else
-            {
-                windowsFlat4 = "jedno okno typu " + flat4.Window1.Name + " a jedno typu " + flat4.Window2.Name;
-            }
-
-            if (flat5.Window2 == null)
-            {
-                windowsFlat5 = "jedno okno typu " + flat5.Window1.Name;
-            }
-            else if (flat5.Window1.Name == flat5.Window2.Name)
-            {
-                windowsFlat5 = "dvě okna typu " + flat5.Window1.Name;
-            }
-            else
-            {
-                windowsFlat5 = "jedno okno typu " + flat5.Window1.Name + " a jedno typu " + flat5.Window2.Name;
-            }
-
-            Console.WriteLine("Byt číslo 1 má šířku {0} metru a výšku {1} metru. Je tvořen " + ((flat1.Door.TwoSided == true) ? "dvoukřídlými" : "jednokřídlymi") + " dveřmi a má {2}.", flat1.Width, flat1.Height, windowsFlat1);
-            Console.WriteLine("Byt číslo 2 má šířku {0} metru a výšku {1} metru. Je tvořen " + ((flat2.Door.TwoSided == true) ? "dvoukřídlými" : "jednokřídlymi") + " dveřmi a má {2}.", flat2.Width, flat2.Height, windowsFlat2);
-            Console.WriteLine("Byt číslo 3 má šířku {0} metru a výšku {1} metru. Je tvořen " + ((flat3.Door.TwoSided == true) ? "dvoukřídlými" : "jednokřídlymi") + " dveřmi a má {2}.", flat3.Width, flat3.Height, windowsFlat3);
-            Console.WriteLine("Byt číslo 4 má šířku {0} metru a výšku {1} metru. Je tvořen " + ((flat4.Door.TwoSided == true) ? "dvoukřídlými" : "jednokřídlymi") + " dveřmi a má {2}.", flat4.Width, flat4.Height, windowsFlat4);
-            Console.WriteLine("Byt číslo 5 má šířku {0} metru a výšku {1} metru. Je tvořen " + ((flat5.Door.TwoSided == true) ? "dvoukřídlými" : "jednokřídlymi") + " dveřmi a má {2}.", flat5.Width, flat5.Height, windowsFlat5);
-
-            //vypsání pater
-            Console.WriteLine();
-            string windows = "";
-
-            Console.WriteLine("V patře číslo {0} ({1}) jsou následující byty: ", floor0.FloorNumber, floor0.FloorDescription);            
-            for (int i = 0; i < floor0.Flat.Count; i++)
-            {
-                if (floor0.Flat[i] == flat1)
-                {
-                    windows = windowsFlat1;
-                }
-                else if (floor0.Flat[i] == flat2)
-                {
-                    windows = windowsFlat2;
-                }
-                else if (floor0.Flat[i] == flat3)
-                {
-                    windows = windowsFlat3;
-                }
-                else if (floor0.Flat[i] == flat4)
-                {
-                    windows = windowsFlat4;
-                }
-                else if (floor0.Flat[i] == flat5)
-                {
-                    windows = windowsFlat5;
-                }
-
-                Console.WriteLine("-> Byt číslo {0} má šířku {1} metru a výšku {2} metru. Je tvořen " + ((floor0.Flat[i].Door.TwoSided == true) ? "dvoukřídlými" : "jednokřídlymi") + " dveřmi a má {3}.", i + 1, floor0.Flat[i].Width, floor0.Flat[i].Height, windows);
-            }
-
-            Console.WriteLine("V patře číslo {0} ({1}) jsou následující byty: ", floor1.FloorNumber, floor1.FloorDescription);
-            for (int i = 0; i < floor1.Flat.Count; i++)
-            {
-                if (floor1.Flat[i] == flat1)
-                {
-                    windows = windowsFlat1;
-                }
-                else if (floor1.Flat[i] == flat2)
-                {
-                    windows = windowsFlat2;
-                }
-                else if (floor1.Flat[i] == flat3)
-                {
-                    windows = windowsFlat3;
-                }
-                else if (floor1.Flat[i] == flat4)
-                {
-                    windows = windowsFlat4;
-                }
-                else if (floor1.Flat[i] == flat5)
-                {
-                    windows = windowsFlat5;
-                }
-
-                Console.WriteLine("-> Byt číslo {0} má šířku {1} metru a výšku {2} metru. Je tvořen " + ((floor1.Flat[i].Door.TwoSided == true) ? "dvoukřídlými" : "jednokřídlymi") + " dveřmi a má {3}.", i + 1, floor1.Flat[i].Width, floor1.Flat[i].Height, windows);
-            }
-
-            Console.WriteLine("V patře číslo {0} ({1}) jsou následující byty: ", floor2.FloorNumber, floor2.FloorDescription);
-            for (int i = 0; i < floor2.Flat.Count; i++)
-            {
-                if (floor2.Flat[i] == flat1)
-                {
-                    windows = windowsFlat1;
-                }
-                else if (floor2.Flat[i] == flat2)
-                {
-                    windows = windowsFlat2;
-                }
-                else if (floor2.Flat[i] == flat3)
-                {
-                    windows = windowsFlat3;
-                }
-                else if (floor2.Flat[i] == flat4)
-                {
-                    windows = windowsFlat4;
-                }
-                else if (floor2.Flat[i] == flat5)
-                {
-                    windows = windowsFlat5;
-                }
-
-                Console.WriteLine("-> Byt číslo {0} má šířku {1} metru a výšku {2} metru. Je tvořen " + ((floor2.Flat[i].Door.TwoSided == true) ? "dvoukřídlými" : "jednokřídlymi") + " dveřmi a má {3}.", i + 1, floor2.Flat[i].Width, floor2.Flat[i].Height, windows);
-            }
-
-            //vypsání adres
-            Console.WriteLine();
-            Console.WriteLine("První adresa: {0} {1}, {2}, {3}", adress1.Adress, adress1.HouseNumber, adress1.City, adress1.PostalCode);
-            Console.WriteLine("Druhá adresa: {0} {1}, {2}, {3}", adress2.Adress, adress2.HouseNumber, adress2.City, adress2.PostalCode);
-            Console.WriteLine("Třetí adresa: {0} {1}, {2}, {3}", adress3.Adress, adress3.HouseNumber, adress3.City, adress3.PostalCode);
-
-            //vypsání paneláku
-            Console.WriteLine();
-            Console.WriteLine("Panelák číslo jedna má adresu: {0} {1}, {2}, {3} a má tyto patra:", towerBlock1.Adress.Adress, towerBlock1.Adress.HouseNumber, towerBlock1.Adress.City, towerBlock1.Adress.PostalCode);
-            for (int i = 0; i < towerBlock1.Floors.Count; i++)
-            {
-                Console.WriteLine("V patře číslo {0} ({1}) jsou následující byty: ", towerBlock1.Floors[i].FloorNumber, towerBlock1.Floors[i].FloorDescription);
-                
-                for (int j = 0; j < towerBlock1.Floors[i].Flat.Count; j++)
-                {
-                    if (towerBlock1.Floors[i].Flat[j] == flat1)
-                    {
-                        windows = windowsFlat1;
-                    }
-                    else if (towerBlock1.Floors[i].Flat[j] == flat2)
-                    {
-                        windows = windowsFlat2;
-                    }
-                    else if (towerBlock1.Floors[i].Flat[j] == flat3)
-                    {
-                        windows = windowsFlat3;
-                    }
-                    else if (towerBlock1.Floors[i].Flat[j] == flat4)
-                    {
-                        windows = windowsFlat4;
-                    }
-                    else if (towerBlock1.Floors[i].Flat[j] == flat5)
-                    {
-                        windows = windowsFlat5;
-                    }
-
-                    Console.WriteLine("-> Byt číslo {0} má šířku {1} metru a výšku {2} metru. Je tvořen " + ((towerBlock1.Floors[i].Flat[j].Door.TwoSided == true) ? "dvoukřídlými" : "jednokřídlymi") + " dveřmi a má {3}.", j + 1, towerBlock1.Floors[i].Flat[j].Width, towerBlock1.Floors[i].Flat[j].Height, windows);
-                }
-            }
-
-            Console.ReadKey(true);
-        }
     }
 }
