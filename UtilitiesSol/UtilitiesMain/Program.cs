@@ -15,95 +15,157 @@ using System.Xml.Serialization;
 
 
 namespace UtilitiesMain
-{
+{        
     class Program
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Barevné popisky:");
-            Console.Write("Funguje/je dokončeno: ");
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("zelená barva");
-            Console.ResetColor();
-            Console.Write("Není dokončeno, částečně funguje: ");
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine("žlutá barva");
-            Console.ResetColor();
-            Console.Write("Nefunguje/není hotové: ");
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("červená barva");
-            Console.ResetColor();
-            Console.WriteLine();
-            Console.WriteLine("Vyberte utilitu, kterou chcete spustit: ");
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("1 - Process Array;");
-            Console.WriteLine("2 - Display Entities;");
-            Console.WriteLine("3 - Process Strings;");
-            Console.WriteLine("4 - Sentence Analyzer");
-            Console.WriteLine("5 - Process List");
-            Console.WriteLine("6 - Document Analyzer");
-            Console.WriteLine("7 - My Stream Reader");
-            Console.WriteLine("8 - House Builder");
-            Console.WriteLine("9 - File Copier - NEW");
-            Console.ResetColor();
-            Console.WriteLine("Pro nejnovější funkční utilitu stiskněte enter nebo zadejte písmeno.");
-            Console.Write("Napište vybrané číslo: ");
-            string option = Console.ReadLine();
-            Console.Clear();
-
-
-            if (int.TryParse(option, out int optionNumber) == false)
-            {
-                optionNumber = 0;
-            }
-
-            switch (optionNumber)
+            switch (SelectionMenu())
             {
                 case 0:
-                    goto New;
-
-                case 1:
                     ProcessArray();
                     break;
 
-                case 2:
+                case 1:
                     DisplayEntities();
                     break;
 
-                case 3:
+                case 2:
                     ProcessStrings();
                     break;
 
-                case 4:
+                case 3:
                     SentenceAnalyzer();
                     break;
 
-                case 5:
+                case 4:
                     ProcessList();
                     break;
 
-                case 6:
+                case 5:
                     DocumentAnalyzer DocAnalyzerInstance = new DocumentAnalyzer();
                     DocAnalyzerInstance.AnalyzerV3();
                     break;
 
-                case 7:
+                case 6:
                     StreamReader();
                     break;
 
-                case 8:
+                case 7:
                     HouseBuilder_program HouseBuilderInstance = new HouseBuilder_program();
                     HouseBuilderInstance.HouseBuilder();
                     break;
 
-                case 9:
-                    New:
+                case 8:
                     FileCopier();
                     break;
             }
         }
 
-        //vytvořeno a dokončeno: 16.9.
+        static int SelectionMenu()
+        {
+            List<string> utilities = new List<string>();
+            utilities.AddRange(new List<string>() 
+            { 
+                "Process Array", 
+                "Display Entities", 
+                "Process Strings", 
+                "Sentence Analyzer", 
+                "Process List", 
+                "Document Analyzer", 
+                "Stream Reader", 
+                "House Builder", 
+                "File Copier" 
+            });            
+            
+            bool confirmed = false;
+            int selection = 0;
+
+            while(!confirmed)
+            {
+                Console.WriteLine("UTILITIES");
+                Console.WriteLine("------");
+                
+                Console.WriteLine("Color legends:");
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("     -> Finished, fully working;");
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("     -> Unfinished, partly working;");
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("     -> Unfinished, not working.");
+                Console.ResetColor();
+
+                Console.WriteLine("---");
+                Console.WriteLine("To select an utility, please use Up and Down arrows.");
+                Console.WriteLine("To confirm your choice, press Enter.");
+                Console.WriteLine("---");
+
+                for(int i = 0; i < utilities.Count; i++)
+                {
+                    if (i == selection)
+                    {
+                        if (utilities[i].StartsWith("*xx*"))
+                        {
+                            Console.BackgroundColor = ConsoleColor.Red;
+                            Console.ForegroundColor = ConsoleColor.Black;
+                            Console.Write(" x   ");
+                        }
+                        else if (utilities[i].StartsWith("*x*"))
+                        {
+                            Console.BackgroundColor = ConsoleColor.Yellow;
+                            Console.ForegroundColor = ConsoleColor.Black;
+                            Console.Write(" !   ");
+                        }
+                        else
+                        {
+                            Console.BackgroundColor = ConsoleColor.Green;
+                            Console.ForegroundColor = ConsoleColor.Black;
+                            Console.Write(" >   ");
+                        }
+
+                        Console.WriteLine("{0}. {1}", i + 1, utilities[i]);
+                    }
+                    else
+                    {
+                        if (utilities[i].StartsWith("*xx*"))
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                        }
+                        else if (utilities[i].StartsWith("*x*"))
+                        {
+                            Console.ForegroundColor = ConsoleColor.Yellow;
+                        }
+                        else
+                        {
+                            Console.ForegroundColor = ConsoleColor.Green;
+                        }
+
+                        Console.WriteLine("     {0}. {1}", i + 1, utilities[i]);
+                    }
+
+                    Console.ResetColor();
+                }
+
+                switch(Console.ReadKey(true).Key)
+                {
+                    case ConsoleKey.UpArrow:
+                        selection = Math.Max(0, selection - 1);
+                        break;
+                    case ConsoleKey.DownArrow:
+                        selection = Math.Min(utilities.Count - 1, selection + 1);
+                        break;
+                    case ConsoleKey.Enter:
+                        confirmed = true;
+                        break;
+                }
+
+                Console.Clear();
+            }
+
+            return selection;
+        }
+        
+        //vytvořeno a dokončeno: 16.9.        
         static void ProcessArray()
         {
             int[] poleCisel = new int[4];
