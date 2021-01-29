@@ -1,0 +1,3 @@
+D:\Projects\School\Programming\003_ThirdGrade\Utilities\utilities\UtilitiesSol\textFiles\sourceTexts\Source*.txt
+
+D:\Projects\School\Programming\003_ThirdGrade\Utilities\utilities\UtilitiesSol\textFiles\newTexts\Source*_copied.txt

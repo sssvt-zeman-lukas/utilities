@@ -9,7 +9,7 @@ namespace UtilitiesMain
     public class DocumentAnalyzer
     {
         // vytvořeno: 14.10.; částečně funkční verze: 21.10.; plně funkční verze, opravené chyby: 28.10.           
-        public void AnalyzerV3() 
+        public void AnalyzerV3()
         {
             List<string> examples = new List<string>();
             examples.Add("Tom was studying English in his room.");
@@ -21,7 +21,7 @@ namespace UtilitiesMain
             examples.Add("Victoria is spending a lot of time inside even though her friends have been trying to get her out, yet she is enjoying the comfort of being home more and more.");
             examples.Add("Nobody is going to go out even if the pandemic will have slowed down, so the streets will remain empty for a few weeks unless the virus is going to stop spreading completely.");
 
-            sentenceInput:
+        sentenceInput:
             bool typing = true;
             List<string> sentences = new List<string>();
             int sentenceNumber = 1;
@@ -749,7 +749,7 @@ namespace UtilitiesMain
                     realpos += 1;
                 }
 
-                error:
+            error:
                 if (error == true)
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
@@ -1107,6 +1107,6 @@ namespace UtilitiesMain
                 Console.Clear();
                 goto sentenceInput;
             }
-        }    
-    }    
+        }
+    }
 }

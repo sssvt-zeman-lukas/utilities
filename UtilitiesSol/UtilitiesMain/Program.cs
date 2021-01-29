@@ -43,7 +43,8 @@ namespace UtilitiesMain
             Console.WriteLine("5 - Process List");
             Console.WriteLine("6 - Document Analyzer");
             Console.WriteLine("7 - My Stream Reader");
-            Console.WriteLine("8 - House Builder - NEW");
+            Console.WriteLine("8 - House Builder");
+            Console.WriteLine("9 - File Copier - NEW");
             Console.ResetColor();
             Console.WriteLine("Pro nejnovější funkční utilitu stiskněte enter nebo zadejte písmeno.");
             Console.Write("Napište vybrané číslo: ");
@@ -91,9 +92,13 @@ namespace UtilitiesMain
                     break;
 
                 case 8:
-                    New:
                     HouseBuilder_program HouseBuilderInstance = new HouseBuilder_program();
                     HouseBuilderInstance.HouseBuilder();
+                    break;
+
+                case 9:
+                    New:
+                    FileCopier();
                     break;
             }
         }
@@ -1185,5 +1190,54 @@ namespace UtilitiesMain
             }
         }        
 
+        static void FileCopier()
+        {
+            FileCopier fileCopier = new FileCopier();
+            
+            string sourcePath = null;
+            string endPath = null;       
+
+            while(!fileCopier.copied)
+            {
+                Console.WriteLine("FILE COPIER");
+                Console.WriteLine("---");
+                
+                if (sourcePath == null && endPath == null)
+                {
+                    Console.Write("Vložte cestu k souboru, který chcete, aby byl překopírován: ");
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    sourcePath = @"" + Console.ReadLine();
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine("Cesta byla úspěšně uložena!");
+                    System.Threading.Thread.Sleep(1000);
+                }               
+                else if (sourcePath != null && endPath == null)
+                {
+                    Console.Write("Vložte cestu, kam chcete, aby se soubor nakopíroval: ");
+                    Console.ForegroundColor = ConsoleColor.Yellow; 
+                    endPath = @"" + Console.ReadLine();
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine("Cesta byla úspěšně uložena!");
+                    System.Threading.Thread.Sleep(1000);
+                }
+                else 
+                {
+                    fileCopier.Copy(sourcePath, endPath);
+
+                    if (fileCopier.copied)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.WriteLine("Soubor byl úspěšně překopírován! :)");
+                    }
+
+                    Console.ForegroundColor = ConsoleColor.DarkGray;
+                    Console.WriteLine("Program bude ukončen.");
+                    System.Threading.Thread.Sleep(5000);
+                }
+
+                Console.ResetColor();
+                Console.Clear();
+            }             
+        }
     }
 }
