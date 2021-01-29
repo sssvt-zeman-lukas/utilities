@@ -64,6 +64,7 @@ namespace UtilitiesMain
 
         static int SelectionMenu()
         {
+            //adding prefixes to utilities name: *xx* = not working, will be unselectable; *x* = working, not finished - will be selectable with a warning
             List<string> utilities = new List<string>();
             utilities.AddRange(new List<string>() 
             { 
@@ -108,39 +109,38 @@ namespace UtilitiesMain
                         {
                             Console.BackgroundColor = ConsoleColor.Red;
                             Console.ForegroundColor = ConsoleColor.Black;
-                            Console.Write(" x   ");
+                            Console.WriteLine(" x   {0}. {1}", i + 1, utilities[i].Substring(4));
                         }
                         else if (utilities[i].StartsWith("*x*"))
                         {
                             Console.BackgroundColor = ConsoleColor.Yellow;
                             Console.ForegroundColor = ConsoleColor.Black;
-                            Console.Write(" !   ");
+                            Console.WriteLine(" !   {0}. {1}", i + 1, utilities[i].Substring(3));
                         }
                         else
                         {
                             Console.BackgroundColor = ConsoleColor.Green;
                             Console.ForegroundColor = ConsoleColor.Black;
-                            Console.Write(" >   ");
+                            Console.WriteLine(" >   {0}. {1}", i + 1, utilities[i]);
                         }
-
-                        Console.WriteLine("{0}. {1}", i + 1, utilities[i]);
                     }
                     else
                     {
                         if (utilities[i].StartsWith("*xx*"))
                         {
                             Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("     {0}. {1}", i + 1, utilities[i].Substring(4));
                         }
                         else if (utilities[i].StartsWith("*x*"))
                         {
                             Console.ForegroundColor = ConsoleColor.Yellow;
+                            Console.WriteLine("     {0}. {1}", i + 1, utilities[i].Substring(3));
                         }
                         else
                         {
                             Console.ForegroundColor = ConsoleColor.Green;
+                            Console.WriteLine("     {0}. {1}", i + 1, utilities[i]);
                         }
-
-                        Console.WriteLine("     {0}. {1}", i + 1, utilities[i]);
                     }
 
                     Console.ResetColor();
@@ -155,7 +155,11 @@ namespace UtilitiesMain
                         selection = Math.Min(utilities.Count - 1, selection + 1);
                         break;
                     case ConsoleKey.Enter:
-                        confirmed = true;
+                        if(!utilities[selection].StartsWith("*xx*"))
+                        {
+                            confirmed = true;
+                        }
+                        
                         break;
                 }
 
