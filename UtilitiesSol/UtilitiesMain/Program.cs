@@ -18,51 +18,64 @@ namespace UtilitiesMain
 {        
     class Program
     {
-        static void Main(string[] args)
+        enum utility
         {
+            ProcessArray,
+            DisplayEntities,
+            ProcessStrings,
+            SentenceAnalyzer,
+            ProcessList,
+            DocumentAnalyzer,
+            StreamReader,
+            HouseBuilder,
+            FileCopier,
+        }
+        
+        static void Main(string[] args)
+        { 
             switch (SelectionMenu())
             {
-                case 0:
+                case utility.ProcessArray:
                     ProcessArray();
                     break;
 
-                case 1:
+                case utility.DisplayEntities:
                     DisplayEntities();
                     break;
 
-                case 2:
+                case utility.ProcessStrings:
                     ProcessStrings();
                     break;
 
-                case 3:
+                case utility.SentenceAnalyzer:
                     SentenceAnalyzer();
                     break;
 
-                case 4:
+                case utility.ProcessList:
                     ProcessList();
                     break;
 
-                case 5:
+                case utility.DocumentAnalyzer:
                     DocumentAnalyzer DocAnalyzerInstance = new DocumentAnalyzer();
                     DocAnalyzerInstance.AnalyzerV3();
                     break;
 
-                case 6:
+                case utility.StreamReader:
                     StreamReader();
                     break;
 
-                case 7:
+                case utility.HouseBuilder:
                     HouseBuilder_program HouseBuilderInstance = new HouseBuilder_program();
                     HouseBuilderInstance.HouseBuilder();
                     break;
 
-                case 8:
+                case utility.FileCopier:
                     FileCopier();
                     break;
             }
         }
 
-        static int SelectionMenu()
+        static utility SelectionMenu()
         {
             //adding prefixes to utilities name: *xx* = not working, will be unselectable; *x* = working, not finished - will be selectable with a warning
             List<string> utilities = new List<string>();
@@ -166,7 +179,7 @@ namespace UtilitiesMain
                 Console.Clear();
             }
 
-            return selection;
+            return (utility)selection;
         }
         
         //vytvořeno a dokončeno: 16.9.        
