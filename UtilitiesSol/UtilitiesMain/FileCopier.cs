@@ -9,7 +9,7 @@ using System.Xml.Linq;
 
 namespace UtilitiesMain
 {
-    public class FileCopier
+    public class FileCopierApp
     {
         private bool Copied = false;
         

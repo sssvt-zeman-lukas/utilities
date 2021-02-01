@@ -29,10 +29,11 @@ namespace UtilitiesMain
             StreamReader,
             HouseBuilder,
             FileCopier,
+            FileExplorer,
         }
         
         static void Main(string[] args)
-        { 
+        {           
             switch (SelectionMenu())
             {
                 case utility.ProcessArray:
@@ -72,6 +73,15 @@ namespace UtilitiesMain
                 case utility.FileCopier:
                     FileCopier();
                     break;
+
+                case utility.FileExplorer:
+                    Console.SetWindowSize(150, 40);
+                    FileExplorer fileExplorer = new FileExplorer();
+                    List<string> extensions = new List<string>();
+                    extensions.Add("*.txt");
+                    fileExplorer.AllowedExtensions = extensions;
+                    fileExplorer.ExploreFiles(@"D:\Projects\School\Programming\003_ThirdGrade\Utilities\utilities\UtilitiesSol\textFiles\sourceTexts", "UTILITYTEST");
+                    break;
             }
         }
 
@@ -89,7 +99,8 @@ namespace UtilitiesMain
                 "Document Analyzer", 
                 "Stream Reader", 
                 "House Builder", 
-                "File Copier" 
+                "File Copier",
+                "*x*File Explorer (Alpha Version)"
             });            
             
             bool confirmed = false;
@@ -1271,7 +1282,7 @@ namespace UtilitiesMain
 
         static void FileCopier()
         {
-            FileCopier fileCopier = new FileCopier();
+            FileCopierApp fileCopier = new FileCopierApp();
             
             string sourcePath = null;
             string endPath = null;       
