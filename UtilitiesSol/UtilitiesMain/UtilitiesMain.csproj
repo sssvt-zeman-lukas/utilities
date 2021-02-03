@@ -44,7 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FileCopier.cs" />
-    <Compile Include="FileCopier\TextFileExplorer.cs" />
+    <Compile Include="FileExplorer.cs" />
     <Compile Include="HouseBuilder.cs" />
     <Compile Include="HouseBuilder\HouseBuilder_Adress.cs" />
     <Compile Include="HouseBuilder\HouseBuilder_Door.cs" />

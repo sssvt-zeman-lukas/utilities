@@ -18,7 +18,7 @@ namespace UtilitiesMain
 {        
     class Program
     {
-        enum utility
+        enum Utility
         {
             ProcessArray,
             DisplayEntities,
@@ -36,56 +36,55 @@ namespace UtilitiesMain
         {           
             switch (SelectionMenu())
             {
-                case utility.ProcessArray:
+                case Utility.ProcessArray:
                     ProcessArray();
                     break;
 
-                case utility.DisplayEntities:
+                case Utility.DisplayEntities:
                     DisplayEntities();
                     break;
 
-                case utility.ProcessStrings:
+                case Utility.ProcessStrings:
                     ProcessStrings();
                     break;
 
-                case utility.SentenceAnalyzer:
+                case Utility.SentenceAnalyzer:
                     SentenceAnalyzer();
                     break;
 
-                case utility.ProcessList:
+                case Utility.ProcessList:
                     ProcessList();
                     break;
 
-                case utility.DocumentAnalyzer:
+                case Utility.DocumentAnalyzer:
                     DocumentAnalyzer DocAnalyzerInstance = new DocumentAnalyzer();
                     DocAnalyzerInstance.AnalyzerV3();
                     break;
 
-                case utility.StreamReader:
+                case Utility.StreamReader:
                     StreamReader();
                     break;
 
-                case utility.HouseBuilder:
+                case Utility.HouseBuilder:
                     HouseBuilder_program HouseBuilderInstance = new HouseBuilder_program();
                     HouseBuilderInstance.HouseBuilder();
                     break;
 
-                case utility.FileCopier:
+                case Utility.FileCopier:
                     FileCopier();
                     break;
 
-                case utility.FileExplorer:
-                    Console.SetWindowSize(150, 40);
-                    FileExplorer fileExplorer = new FileExplorer();
+                case Utility.FileExplorer:
+                    Console.SetWindowSize(155, 40);
                     List<string> extensions = new List<string>();
                     extensions.Add("*.txt");
-                    fileExplorer.AllowedExtensions = extensions;
-                    fileExplorer.ExploreFiles(@"D:\Projects\School\Programming\003_ThirdGrade\Utilities\utilities\UtilitiesSol\textFiles\sourceTexts", "UTILITYTEST");
+                    FileExplorer fileExplorer = new FileExplorer(extensions, @"D:\Projects\School\Programming\003_ThirdGrade\Utilities\utilities\UtilitiesSol\textFiles\sourceTexts", "UTILITYTESTING");
+                    fileExplorer.ExploreFiles();
                     break;
             }
         }
 
-        static utility SelectionMenu()
+        static Utility SelectionMenu()
         {
             //adding prefixes to utilities name: *xx* = not working, will be unselectable; *x* = working, not finished - will be selectable with a warning
             List<string> utilities = new List<string>();
@@ -183,14 +182,14 @@ namespace UtilitiesMain
                         {
                             confirmed = true;
                         }
-                        
                         break;
                 }
 
-                Console.Clear();
+                Console.SetCursorPosition(0, 0);
             }
 
-            return (utility)selection;
+            Console.Clear();
+            return (Utility)selection;
         }
         
         //vytvořeno a dokončeno: 16.9.        

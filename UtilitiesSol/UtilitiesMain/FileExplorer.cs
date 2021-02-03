@@ -18,6 +18,52 @@ namespace UtilitiesMain
             NoHighlight,
         }
 
+        enum Attribute
+        {
+            Folder,
+            File,
+        }
+
+        enum Buttons
+        {
+            AllControls,
+            RequiredSelection,
+            AddSelection,
+            NoControls,
+        }
+
+        public enum OptionType
+        {
+            Folder,
+            ParentFolder,
+            File,
+            Path,
+        }
+        
+        public enum SavedType
+        {
+            None,
+            Source,
+            End,
+        }
+
+        public enum OptionState
+        {
+            Unselected,
+            Selected,
+            Unselectable,
+            FilesUnselected,
+            FilesSelected,
+            Path,
+        }
+
+        enum Existence
+        {
+            InSavedList,
+            InOptionsList,
+            InFolder,
+        }
+
         enum AttributeType
         {
             FileSize,
@@ -33,167 +79,210 @@ namespace UtilitiesMain
             LineTrim,
         }
 
-        private List<string> sourcePaths = new List<string>();
-        private List<string> endPaths = new List<string>();
-        private List<string> allowedExtensions = new List<string>();
-        private List<string> optionList = new List<string>();
-        private List<string> fileAttributes = new List<string>();
+        private List<int> sourcePaths = new List<int>();
+        private List<int> endPaths = new List<int>();
+        private List<Option> optionList = new List<Option>();
+        private List<Option> savedList = new List<Option>();
+        private int fileID = 0;
+        private bool cleanMemory = false;
+        
+        private List<string> allowedExtensions;
+        private string activeDirectory;
+        private string utilityName;
 
-        private int activeSelection;
         private int savedCursorLeft;
         private int savedCursorTop;
 
-        public void CopyFiles()
+        public FileExplorer(List<string> allowedExtensions, string activeDirectory, string utilityName)
         {
-
+            this.allowedExtensions = allowedExtensions;
+            this.activeDirectory = activeDirectory;
+            this.utilityName = utilityName;
         }
 
-        public void ReadFiles()
-        {
-
-        }
-
-        public void ExploreFiles(string openDirectory, string utilityName)
+        public void ExploreFiles()
         {
             bool selected = false;
             int activeSelection = 5;
-            bool showInstructions = true;
-            string activeDirectory = openDirectory;
+
+            GenerateList(activeDirectory, fileID);
 
             while (!selected)
             {
                 Console.WriteLine("{0} > FILE EXPLORER", utilityName);
                 Console.WriteLine("---");                
-                
-                if (showInstructions) 
-                    WriteInstructions();
 
                 Console.WriteLine();
-
-                fileAttributes.Clear();
-                optionList.Clear();
-                GenerateOptionList(activeDirectory);
-                GenerateFileAttributes(activeSelection);
 
                 savedCursorLeft = Console.CursorLeft;
                 savedCursorTop = Console.CursorTop;
 
                 RenderExplorer(activeSelection);
-                RenderAttributes(activeSelection);
 
                 activeSelection = KeyControl(activeSelection);
+
+                if (cleanMemory)
+                {
+                    ChangeDirectory();
+                    activeSelection = 4;
+                    GenerateList(activeDirectory, 2);
+                    Console.Clear();
+                    cleanMemory = false;
+                }
 
                 Console.SetCursorPosition(0, 0);
             }
         }
 
-        static void WriteInstructions()
+        private void GenerateList(string activeDirectory, int fileID)
         {
-            Console.WriteLine("Instructions:");
-            Console.WriteLine("     -> Move through the file explorer with Up and Down arrows.");
-            Console.WriteLine("     -> To select a file, press Enter. The selected file will be highlighted.");
-            Console.WriteLine("     -> If you are done with selecting files, press Enter on \"done\" button.");
-            Console.WriteLine("     -> You are also able to paste the directory yourself at the top of the screen.");
-        }
+            DirectoryInfo DirInfo = new DirectoryInfo(activeDirectory);
 
-        private void GenerateOptionList(string activeDirectory)
-        {
-            List<string> filesInDirectory = new List<string>();
+            optionList.Add(new Option(0, DirInfo.Name, DirInfo.FullName, OptionType.Path, OptionState.Path, SavedType.None, GetAttributes(DirInfo.FullName, Attribute.Folder)));
+            
+            if (DirInfo.Root.ToString() != DirInfo.FullName)
+                optionList.Add(new Option(1, "... " + DirInfo.Parent.Name, DirInfo.Parent.FullName, OptionType.ParentFolder, OptionState.Unselectable, SavedType.None, GetAttributes(DirInfo.Parent.FullName, Attribute.Folder)));         
 
-            for (int i = 0; i < allowedExtensions.Count; i++)
-            {
-                filesInDirectory.AddRange(Directory.GetFiles(activeDirectory, allowedExtensions[i]));
+            foreach (FileInfo file in DirInfo.GetFiles())
+            {                
+                optionList.Add(new Option(fileID, file.Name, file.FullName, OptionType.File, OptionState.Unselected, SavedType.None, GetAttributes(file.FullName, Attribute.File)));
+                fileID++;
             }
 
-            optionList.Add(activeDirectory);
-            optionList.Add("... (Move to parent folder)");
-            optionList.AddRange(filesInDirectory);
+            foreach(DirectoryInfo directory in DirInfo.GetDirectories())
+            {
+                optionList.Add(new Option(fileID, directory.Name, directory.FullName, OptionType.Folder, OptionState.FilesUnselected, SavedType.None, GetAttributes(directory.FullName, Attribute.Folder)));
+            }
+
+            CheckExistence(Existence.InOptionsList);
+            //CheckExistence(Existence.InFolder);
         }
 
-        static void ChangeColor(ColorType colorType)
+        static List<string> GetAttributes(string filePath, Attribute attribute)
         {
-            switch (colorType)
+            List<string> attributes = new List<string>();
+            
+            switch (attribute)
             {
-                case ColorType.Selectable:
-                    Console.ForegroundColor = ConsoleColor.Black;
-                    Console.BackgroundColor = ConsoleColor.DarkCyan;
+                case Attribute.Folder:
+                    DirectoryInfo di = new DirectoryInfo(filePath);
+                    attributes.Add("");
+                    attributes.Add("" + di.CreationTime);
+                    attributes.Add("" + di.LastWriteTime);
+                    attributes.Add("");
                     break;
 
-                case ColorType.Selected:
-                    Console.ForegroundColor = ConsoleColor.Black;
-                    Console.BackgroundColor = ConsoleColor.Cyan;
-                    break;
-
-                case ColorType.SelectableSelected:
-                    Console.ForegroundColor = ConsoleColor.Black;
-                    Console.BackgroundColor = ConsoleColor.DarkMagenta;
-                    break;
-
-                case ColorType.Highlight:
-                    Console.ForegroundColor = ConsoleColor.Black;
-                    Console.BackgroundColor = ConsoleColor.Gray;
-                    break;
-
-                case ColorType.NoHighlight:
-                    Console.ResetColor();
+                case Attribute.File:
+                    FileInfo fi = new FileInfo(filePath);
+                    attributes.Add(fi.Extension);
+                    attributes.Add("" + fi.CreationTime);
+                    attributes.Add("" + fi.LastWriteTime);
+                    attributes.Add("" + fi.Length);
                     break;
             }
+
+            return attributes;
         }
 
-        private void RenderAttributes(int activeSelection)
+        private void CheckExistence(Existence existence)
         {
-            for (int line = 0; line < fileAttributes.Count + 4; line++)
+            switch (existence)
             {
-                switch (line)
-                {
-                    case 0:
-                    case 2:
-                    case int i when (i == fileAttributes.Count + 3):
-                        Console.SetCursorPosition(105, savedCursorTop);
-                        
-                        for (int j = 105; j <= 145; j++)
+                case Existence.InSavedList:
+                    for (int i = 0; i < savedList.Count; i++)
+                    {
+                        for (int j = 0; j < optionList.Count; j++)
                         {
-                            Console.Write("-");
+                            if (savedList[i].filePath.Equals(optionList[j].filePath) && optionList[j].optionState == OptionState.Unselected)
+                            {
+                                savedList.RemoveAt(i);
+                                break;
+                            }
+                        }
+                    }
+                    break;
+
+                case Existence.InOptionsList:
+                    for (int i = 0; i < savedList.Count; i++)
+                    {
+                        for (int j = 0; j < optionList.Count; j++)
+                        {
+                            if (savedList[i].filePath.Equals(optionList[j].filePath))
+                            {
+                                optionList[j] = savedList[i];
+                            }
+                        }
+                    }
+                    break;
+
+                case Existence.InFolder:
+                    DirectoryInfo dirInfo = new DirectoryInfo(activeDirectory);
+                    DirectoryInfo[] directories = dirInfo.GetDirectories();
+                    List<DirectoryInfo> folders = new List<DirectoryInfo>();
+
+                    for (int i = 0; i < directories.Length; i++)
+                    {
+                        FileInfo[] files = directories[i].GetFiles();
+                        DirectoryInfo[] dirsInDir = directories[i].GetDirectories();
+                        List<string> paths = new List<string>();
+                        
+                        foreach (FileInfo file in files)
+                        {
+                            paths.Add(file.FullName);
                         }
 
-                        savedCursorTop++;
+                        foreach (DirectoryInfo dir in dirsInDir)
+                        {
+                            paths.Add(dir.FullName);
+                        }
+                        
+                        for (int j = 0; j < savedList.Count; j++)
+                        {
+                            for (int k = 0; k < paths.Count; k++)
+                            {
+                                if (savedList[j].filePath == paths[k])
+                                {
+                                    if (savedList[j].optionType == OptionType.Folder)
+                                    {
+                                        DirectoryInfo di = new DirectoryInfo(savedList[j].filePath);
+                                        folders.Add(di.Parent);
+                                    }
+                                    else
+                                    {
+                                        FileInfo fi = new FileInfo(savedList[j].filePath);
+                                        folders.Add(fi.Directory);
+                                    }
+                                }
+                            }
+                        }
+                    }
 
-                        break;
+                    for (int i = 0; i < folders.Count; i++)
+                    {
+                        for (int j = 0; j < optionList.Count; j++)
+                        {
+                            if (optionList[j].optionType == OptionType.Folder && folders[i].FullName == optionList[j].filePath)
+                            {
+                                optionList[j].optionState = OptionState.FilesSelected;
+                                break;
+                            }
+                        }
+                    }
 
-                    case 1:
-                        Console.SetCursorPosition(105, savedCursorTop);
-                        Console.Write("| File Attributes");
-                        Console.SetCursorPosition(145, Console.CursorTop);
-                        Console.Write("|");
-
-                        savedCursorTop++;
-
-                        break;
-
-                    case int i when (i >= 3 && i < fileAttributes.Count + 3):
-                        Console.SetCursorPosition(105, savedCursorTop);
-                        Console.Write("| ");
-                        Console.Write(fileAttributes[line - 3]);
-                        Console.SetCursorPosition(145, Console.CursorTop);
-                        Console.Write("|");
-
-                        savedCursorTop++;
-
-                        break;
-                }
+                    break;
             }
         }
 
         private void RenderExplorer(int activeSelection)
         {
             for (int i = 0; i < optionList.Count + 4; i++)
-            {              
+            {
                 switch (i)
                 {
                     case 0:
                     case 2:
-                    case int k when (k == optionList.Count + 3):
-                        for (int j = 0; j <= 100; j++)
+                    case int j when (j == optionList.Count + 3):
+                        for (int k = 0; k <= 150; k++)
                         {
                             Console.Write("-");
                         }
@@ -202,147 +291,254 @@ namespace UtilitiesMain
                     case 1:
                         Console.Write("| ");
 
-                        if (activeSelection == i)
-                        {
-                            Console.Write("> Active Directory: ");
-                            ChangeColor(ColorType.Highlight);
-                            Console.Write(TrimPath(optionList[0], TrimType.LineTrim));
-                            RenderHighlight(100);
-                        }
-                        else
-                        {
-                            ChangeColor(ColorType.NoHighlight);
-                            Console.Write("Active Directory: {0}", TrimPath(optionList[0], TrimType.LineTrim));
-                            RenderHighlight(100);
-                        }
+                        ChangeColor(optionList[0].optionState, activeSelection == i);
+                        RenderHighlight(150);
 
-                        ChangeColor(ColorType.NoHighlight);
+                        Console.SetCursorPosition(6, Console.CursorTop);
+                        Console.Write(optionList[0].fileName);
 
-                        Console.SetCursorPosition(100, Console.CursorTop);
+                        Console.ResetColor();
+
+                        Console.SetCursorPosition(150, Console.CursorTop);
                         Console.Write("|");
 
                         break;
 
                     case 3:
-                        Console.Write("| File:");
+                        Console.Write("| ");
+                        Console.SetCursorPosition(6, Console.CursorTop);
+                        Console.Write("File:");
+                        Console.SetCursorPosition(50, Console.CursorTop);
+                        Console.Write("Type:");
                         Console.SetCursorPosition(70, Console.CursorTop);
                         Console.Write("State:");
-
-                        Console.SetCursorPosition(100, Console.CursorTop);
+                        Console.SetCursorPosition(90, Console.CursorTop);
+                        Console.Write("Created:");
+                        Console.SetCursorPosition(115, Console.CursorTop);
+                        Console.Write("Modified:");
+                        Console.SetCursorPosition(140, Console.CursorTop);
+                        Console.Write("Size:");
+                        Console.SetCursorPosition(150, Console.CursorTop);
                         Console.Write("|");
                         break;
 
                     case int j when (j >= 4 && j < optionList.Count + 3):
                         Console.Write("| ");
 
-                        if (activeSelection == i)
-                        {
-                            if (sourcePaths.Contains(optionList[i - 3]))
-                            {
-                                ChangeColor(ColorType.SelectableSelected);
-                                Console.Write("< {0}", TrimPath(optionList[i - 3], TrimType.TrimPath));
-                                RenderHighlight(100);
-                                Console.SetCursorPosition(70, Console.CursorTop);
-                                Console.Write("Selected");
-                            }
-                            else
-                            {
-                                ChangeColor(ColorType.Selectable);
-                                Console.Write("> {0}", TrimPath(optionList[i - 3], TrimType.TrimPath));
-                                RenderHighlight(100);
-                                Console.SetCursorPosition(70, Console.CursorTop);
-                                Console.Write("Unselected");
-                            }
-                        }
-                        else
-                        {
-                            if (sourcePaths.Contains(optionList[i - 3]))
-                            {
-                                ChangeColor(ColorType.Selected);
-                                Console.Write("+ {0}", TrimPath(optionList[i - 3], TrimType.TrimPath));
-                                RenderHighlight(100);
-                                Console.SetCursorPosition(70, Console.CursorTop);
-                                Console.Write("Selected");
-                            }
-                            else
-                            {
-                                ChangeColor(ColorType.NoHighlight);
-                                Console.Write(TrimPath(optionList[i - 3], TrimType.TrimPath));
-                                RenderHighlight(100);
-                                Console.SetCursorPosition(70, Console.CursorTop);
-                                Console.Write("Unselected");
-                            }
-                        }
+                        ChangeColor(optionList[i - 3].optionState, activeSelection == i);
+                        RenderHighlight(150);
 
-                        ChangeColor(ColorType.NoHighlight);
+                        Console.SetCursorPosition(6, Console.CursorTop);
+                        Console.Write(optionList[i - 3].fileName);
+                        Console.SetCursorPosition(50, Console.CursorTop);
+                        Console.Write(EnumSeparator(optionList[i - 3].optionType.ToString()));
+                        Console.SetCursorPosition(70, Console.CursorTop);
+                        Console.Write(EnumSeparator(optionList[i - 3].optionState.ToString()));
+                        Console.SetCursorPosition(90, Console.CursorTop);
+                        Console.Write(optionList[i - 3].attributes[1]);
+                        Console.SetCursorPosition(115, Console.CursorTop);
+                        Console.Write(optionList[i - 3].attributes[2]);
+                        Console.SetCursorPosition(140, Console.CursorTop);
+                        
+                        if (optionList[i - 3].optionType != OptionType.Folder && optionList[i - 3].optionType != OptionType.ParentFolder)
+                            RecalculateSize(optionList[i - 3].attributes[3]);
 
-                        Console.SetCursorPosition(100, Console.CursorTop);
+                        Console.ResetColor();
+
+                        Console.SetCursorPosition(150, Console.CursorTop);
                         Console.Write("|");
                         break;
                 }
 
-                ChangeColor(ColorType.NoHighlight);
+                Console.ResetColor();
                 Console.WriteLine();
             }
         }
 
-        private void GenerateFileAttributes(int activeSelection)
+        private void RenderTips()
         {
-            fileAttributes.Add(WriteAttribute(AttributeType.FileType, activeSelection));
-            fileAttributes.Add(WriteAttribute(AttributeType.Created, activeSelection));
-            fileAttributes.Add(WriteAttribute(AttributeType.Modified, activeSelection));
-            fileAttributes.Add(WriteAttribute(AttributeType.FileSize, activeSelection));
+
         }
 
-        private string WriteAttribute(AttributeType attributeType, int activeSelection)
+        private void RenderButtons(int activeSelection)
         {
-            string attribute = "";
-            
-            if (activeSelection >= 5)
+
+        }
+
+        private void RenderMessage(int activeSelection)
+        {
+
+        }
+
+        static void RenderHighlight(int endColumn)
+        { 
+            for (int i = Console.CursorLeft; i < endColumn - 1; i++)
             {
-                switch (attributeType)
+                Console.Write(" ");
+            }
+        }
+
+        static void ChangeColor(OptionState optionState, bool activeSelection)
+        {
+            if (activeSelection)
+            {
+                switch (optionState)
                 {
-                    case AttributeType.FileType:
-                        attribute = "File Type: " + TrimPath(optionList[activeSelection - 3], TrimType.FileTypeTrim);
+                    case OptionState.Selected:
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.BackgroundColor = ConsoleColor.DarkRed;
+                        Console.Write("<");
                         break;
 
-                    case AttributeType.Created:
-                        attribute = "Created: " + File.GetCreationTime(optionList[activeSelection - 3]);
+                    case OptionState.Unselected:
+                        Console.ForegroundColor = ConsoleColor.Black;
+                        Console.BackgroundColor = ConsoleColor.DarkCyan;
+                        Console.Write(">");
                         break;
 
-                    case AttributeType.Modified:
-                        attribute = "Modified: " + File.GetLastWriteTime(optionList[activeSelection - 3]);
+                    case OptionState.FilesSelected:
+                        Console.ForegroundColor = ConsoleColor.Black;
+                        Console.BackgroundColor = ConsoleColor.Blue;
+                        Console.Write("/>");
                         break;
 
-                    case AttributeType.FileSize:
-                        FileInfo fi = new FileInfo(optionList[activeSelection - 3]);
+                    case OptionState.FilesUnselected:
+                        Console.ForegroundColor = ConsoleColor.Black;
+                        Console.BackgroundColor = ConsoleColor.DarkCyan;
+                        Console.Write("/>");
+                        break;
 
-                        attribute = "File Size: ";
+                    case OptionState.Unselectable:
+                        Console.ForegroundColor = ConsoleColor.Gray;
+                        Console.BackgroundColor = ConsoleColor.DarkBlue;
+                        Console.Write("/<");
+                        break;
 
-                        switch (fi.Length)
-                        {
-                            case long i when (i < 1000):
-                                attribute += fi.Length + " Bytes";
-                                break;
-
-                            case long i when (i < 1000000):
-                                attribute += fi.Length / 1000 + " kB";
-                                break;
-
-                            case long i when (i < 1000000000):
-                                attribute += fi.Length / 1000000 + " MB";
-                                break;
-
-                            case long i when (i < 1000000000000):
-                                attribute += fi.Length / 1000000000 + " GB";
-                                break;
-                        }
-
+                    case OptionState.Path:
+                        Console.ForegroundColor = ConsoleColor.Black;
+                        Console.BackgroundColor = ConsoleColor.Gray;
+                        Console.Write(">>");
                         break;
                 }
             }
+            else
+            {
+                switch (optionState)
+                {
+                    case OptionState.Selected:
+                        Console.ForegroundColor = ConsoleColor.Black;
+                        Console.BackgroundColor = ConsoleColor.Cyan;
+                        Console.Write("+");
+                        break;
 
-            return attribute;
+                    case OptionState.FilesSelected:
+                        Console.ForegroundColor = ConsoleColor.Black;
+                        Console.BackgroundColor = ConsoleColor.Cyan;
+                        Console.Write("/+");
+                        break;
+
+                    case OptionState.Unselected:
+                    case OptionState.FilesUnselected:
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.BackgroundColor = ConsoleColor.Black;
+                        break;
+
+                    case OptionState.Unselectable:
+                        Console.ResetColor();
+                        break;
+
+                    case OptionState.Path:
+                        Console.ResetColor();
+                        Console.Write("P>");
+                        break;
+                }
+            }
+        }
+
+        static string EnumSeparator(string text)
+        {
+            char[] separatedChar = text.ToCharArray();
+            List<int> indexes = new List<int>();
+            List<string> substrings = new List<string>();
+            int index = 0;
+
+            foreach (char ch in separatedChar)
+            { 
+                if (char.IsUpper(ch))
+                {
+                    indexes.Add(index);
+                }
+
+                index++;
+            }
+
+            for (int i = 0; i < indexes.Count; i++)
+            {
+                if (i + 1 < indexes.Count)
+                {
+                    substrings.Add(text.Substring(indexes[i], indexes[i + 1] - indexes[i]));
+                }
+                else
+                {
+                    substrings.Add(text.Substring(indexes[i]));
+                }
+            }
+
+            text = null;
+
+            foreach (string part in substrings)
+            {
+                if (text == null)
+                {
+                    text = part;
+                }
+                else
+                {
+                    text = text + " " + part;
+                }
+            }
+
+            return text;
+        }
+
+        static void RecalculateSize(string sizeInBytes)
+        {
+            if (long.TryParse(sizeInBytes, out long size))
+            {
+                switch (size)
+                {
+                    case long s when (s < 1000):
+                        Console.Write(size + " B");
+                        break;
+
+                    case long s when (s < 1000000):
+                        Console.Write(size / 1000 + " kB");
+                        break;
+
+                    case long s when (s < 1000000000):
+                        Console.Write(size / 1000000 + " MB");
+                        break;
+
+                    case long s when (s < 1000000000000):
+                        Console.Write(size / 1000000000 + " GB");
+                        break;
+                }
+            }
+        }
+
+        private void ChangeDirectory()
+        {
+            foreach (Option option in optionList)
+            {
+                if (option.optionState == OptionState.Selected || option.optionState == OptionState.FilesSelected)
+                {
+                    savedList.Add(option);
+                }
+
+                CheckExistence(Existence.InSavedList);
+            }
+
+            optionList.Clear();
         }
 
         private int KeyControl(int activeSelection)
@@ -382,59 +578,36 @@ namespace UtilitiesMain
                     break;
 
                 case ConsoleKey.Enter:
-                    if (sourcePaths.Contains(optionList[activeSelection - 3]))
+                    if (optionList[activeSelection - 3].optionState == OptionState.Selected && optionList[activeSelection - 3].optionType == OptionType.File)
                     {
-                        sourcePaths.Remove(optionList[activeSelection - 3]);
+                        optionList[activeSelection - 3].optionState = OptionState.Unselected;
                     } 
-                    else
+                    else if (optionList[activeSelection - 3].optionType == OptionType.File)
                     {
-                        sourcePaths.Add(optionList[activeSelection - 3]);
+                        optionList[activeSelection - 3].optionState = OptionState.Selected;
                     }
+                    else if (optionList[activeSelection - 3].optionType == OptionType.Folder || optionList[activeSelection - 3].optionType == OptionType.ParentFolder)
+                    {
+                        activeDirectory = optionList[activeSelection - 3].filePath;
+                        cleanMemory = true;
+                    }
+                    else if (optionList[activeSelection - 3].optionType == OptionType.Path)
+                    {
+
+                    }
+
                     break;
             }
 
             return activeSelection;
         }
 
-        static string TrimPath(string path, TrimType trimType)
-        {
-            int index = 0;
-            
-            switch (trimType)
-            {
-                case TrimType.TrimPath:
-                    index = path.LastIndexOf("\\");
-                    path = path.Substring(index + 1);
-                    break;
-
-                case TrimType.LineTrim:
-                    index = path.Length - 79;
-                    path = path.Substring(index + 21);
-                    break;
-
-                case TrimType.FileTypeTrim:
-                    index = path.LastIndexOf(".");
-                    path = path.Substring(index + 1);
-                    break;
-            }
-
-            return path;
-        }
-
-        static void RenderHighlight(int endColumn)
-        { 
-            for (int i = Console.CursorLeft; i < endColumn; i++)
-            {
-                Console.Write(" ");
-            }
-        }
-
-        public List<string> SourcePaths
+        public List<int> SourcePaths
         {
             get { return sourcePaths; }
         }
 
-        public List<string> EndPaths
+        public List<int> EndPaths
         {
             get { return endPaths; }
         }
@@ -443,6 +616,67 @@ namespace UtilitiesMain
         {
             get { return allowedExtensions; }
             set { allowedExtensions = value; }
+        }
+    }
+
+    class Option
+    {    
+        private int ID;
+        private string FileName;
+        private string FilePath;
+        private FileExplorer.OptionType OptionType;
+        private FileExplorer.OptionState OptionState;
+        private FileExplorer.SavedType SavedType;
+        private List<string> Attributes;
+
+        public Option(int ID, string FileName, string FilePath, FileExplorer.OptionType OptionType, FileExplorer.OptionState OptionState, FileExplorer.SavedType SavedType, List<string> Attributes)
+        {
+            this.ID = ID;
+            this.FileName = FileName;
+            this.FilePath = FilePath;
+            this.OptionType = OptionType;
+            this.OptionState = OptionState;
+            this.SavedType = SavedType;
+            this.Attributes = Attributes;
+        }
+
+        public int id
+        {
+            get { return ID; }
+            set { ID = value; }
+        }
+        
+        public string fileName
+        {
+            get { return FileName; }
+            set { FileName = value; }
+        }
+
+        public string filePath
+        {
+            get { return FilePath; }
+        }
+
+        public FileExplorer.OptionType optionType
+        {
+            get { return OptionType; }
+        }
+
+        public FileExplorer.OptionState optionState
+        {
+            get { return OptionState; }
+            set { OptionState = value; }
+        }
+
+        public FileExplorer.SavedType savedType
+        {
+            get { return SavedType; }
+            set { SavedType = value; }
+        }
+
+        public List<string> attributes
+        {
+            get { return Attributes; }
         }
     }
 }
