@@ -12,6 +12,7 @@ using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
+using UtilitiesMain.CSV_Processing;
 
 
 namespace UtilitiesMain
@@ -30,6 +31,7 @@ namespace UtilitiesMain
             HouseBuilder,
             FileCopier,
             FileExplorer,
+            CSV_Processing,
         }
         
         static void Main(string[] args)
@@ -75,11 +77,20 @@ namespace UtilitiesMain
                     break;
 
                 case Utility.FileExplorer:
-                    Console.SetWindowSize(155, 40);
+                    Console.SetWindowSize(156, 41);
                     List<string> extensions = new List<string>();
                     extensions.Add("*.txt");
-                    FileExplorer fileExplorer = new FileExplorer(extensions, @"D:\Projects\School\Programming\003_ThirdGrade\Utilities\utilities\UtilitiesSol\textFiles\sourceTexts", "UTILITYTESTING");
+                    FileExplorer fileExplorer = new FileExplorer(FileExplorer.ExplorerMode.OpenOne, extensions, @"D:\Projects\School\Programming\003_ThirdGrade\Utilities\utilities\UtilitiesSol\textFiles\sourceTexts", "UTILITYTESTING");
                     fileExplorer.ExploreFiles();
+                    break;
+
+                case Utility.CSV_Processing:
+                    CSV_Parser parser = new CSV_Parser();
+                    CSV_Creator creator = new CSV_Creator();
+                    CSV_Tester tester = new CSV_Tester();
+                    creator.SaveCSV(@"D:\Projects\School\Programming\003_ThirdGrade\Utilities\utilities\UtilitiesSol\csvFiles\newCSV\CellTowers_ZemanLukas.csv", parser.LoadCSV(@"D:\Projects\School\Programming\003_ThirdGrade\Utilities\utilities\UtilitiesSol\csvFiles\sourceCSV\CellTowers_ZemanLukas.csv"));
+                    tester.TestCSV();
+                    Console.ReadKey(true);
                     break;
             }
         }
@@ -99,7 +110,8 @@ namespace UtilitiesMain
                 "Stream Reader", 
                 "House Builder", 
                 "File Copier",
-                "*x*File Explorer (Alpha Version)"
+                "*x*File Explorer (Alpha Version)",
+                "CSV Processing"
             });            
             
             bool confirmed = false;
