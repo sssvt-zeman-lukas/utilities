@@ -13,6 +13,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using UtilitiesMain.CSV_Processing;
+using System.Windows.Forms;
+using UtilitiesMain.WinFormsApps;
 
 
 namespace UtilitiesMain
@@ -32,8 +34,10 @@ namespace UtilitiesMain
             FileCopier,
             FileExplorer,
             CSV_Processing,
+            WinFormsPaint,
         }
-        
+
+        [STAThread]
         static void Main(string[] args)
         {           
             switch (SelectionMenu())
@@ -92,6 +96,11 @@ namespace UtilitiesMain
                     tester.TestCSV();
                     Console.ReadKey(true);
                     break;
+
+                case Utility.WinFormsPaint:
+                    WinFormsApp Paint = new WinFormsApp();
+                    Paint.RunApp();
+                    break;
             }
         }
 
@@ -111,7 +120,8 @@ namespace UtilitiesMain
                 "House Builder", 
                 "File Copier",
                 "*x*File Explorer (Alpha Version)",
-                "CSV Processing"
+                "CSV Processing",
+                "WinForms Paint"
             });            
             
             bool confirmed = false;
@@ -1340,5 +1350,22 @@ namespace UtilitiesMain
                 Console.Clear();
             }             
         }
+    }
+
+    public class WinFormsApp
+    {
+        [STAThread]
+        public void RunApp()
+        {
+            if (Environment.OSVersion.Version.Major >= 6)
+                SetProcessDPIAware();
+
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            Application.Run(new WinFormsApps.Paint.PaintForm());
+        }
+
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        private static extern bool SetProcessDPIAware();
     }
 }

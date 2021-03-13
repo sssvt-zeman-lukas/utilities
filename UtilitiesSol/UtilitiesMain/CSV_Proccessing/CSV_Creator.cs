@@ -27,9 +27,9 @@ namespace UtilitiesMain.CSV_Processing
                     streamWriter.WriteLine();
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine(e);
+                
             }
             finally
             {

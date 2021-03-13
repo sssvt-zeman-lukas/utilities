@@ -1,0 +1,5 @@
+ObjectType;PositionZ;BorderColor_R;BorderColor_G;BorderColor_B;BorderColor_A;BorderThickness;FillColor_R;FillColor_G;FillColor_B;FillColor_A;ObjectFillGroup;StartX;StartY;CenterX;CenterY;EndX;EndY
+Background;0;;;;;;0;0;255;255;;;;;;;
+Line;1;255;0;0;255;19;255;255;255;0;0;276;676;761;440;1246;204
+Line;2;0;255;255;255;4;255;255;255;0;0;351;159;781;418;1211;678
+Line;3;128;0;64;255;50;255;255;255;0;0;786;84;784;416;783;749
